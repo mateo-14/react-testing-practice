@@ -12,6 +12,7 @@ import (
 func Routes(db *sql.DB, authService AuthService) http.Handler {
 	r := chi.NewRouter()
 
+	// Login endpoint
 	r.Post("/login", func(w http.ResponseWriter, r *http.Request) {
 		body := &LoginRequest{}
 		if err := render.Bind(r, body); err != nil {
@@ -31,6 +32,7 @@ func Routes(db *sql.DB, authService AuthService) http.Handler {
 
 	})
 
+	// Register endpoint
 	r.Post("/register", func(w http.ResponseWriter, r *http.Request) {
 		body := &LoginRequest{}
 		if err := render.Bind(r, body); err != nil {
