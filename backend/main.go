@@ -26,11 +26,19 @@ func main() {
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
+	setupRoutes(r, db)
+
+	http.ListenAndServe(":8080", r)
+}
+
+func setupRoutes(r *chi.Mux, db *sql.DB) {
+	// Create dependencies
+	authRepository := auth.NewAuthRepository(db)
+	authService := auth.NewAuthService(authRepository)
 
 	r.Route("/api", func(r chi.Router) {
-		r.Mount("/auth", auth.Routes(db))
+		r.Mount("/auth", auth.Routes(db, authService))
 		r.Mount("/todos", todos.Routes(db))
 	})
 
-	http.ListenAndServe(":8080", r)
 }
