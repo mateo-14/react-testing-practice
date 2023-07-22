@@ -35,10 +35,12 @@ func setupRoutes(r *chi.Mux, db *sql.DB) {
 	// Create dependencies
 	authRepository := auth.NewAuthRepository(db)
 	authService := auth.NewAuthService(authRepository)
+	todosRepository := todos.NewTodosRepository(db)
+	todosService := todos.NewTodosService(todosRepository)
 
 	r.Route("/api", func(r chi.Router) {
 		r.Mount("/auth", auth.Routes(db, authService))
-		r.Mount("/todos", todos.Routes(db))
+		r.Mount("/todos", todos.Routes(db, todosService))
 	})
 
 }

@@ -7,17 +7,17 @@ type TodosService interface {
 }
 
 type todosService struct {
-	todoRepository TodoRepository
+	todosRepository TodosRepository
 }
 
-func NewTodosService(todoRepository TodoRepository) TodosService {
+func NewTodosService(todosRepository TodosRepository) TodosService {
 	return &todosService{
-		todoRepository: todoRepository,
+		todosRepository: todosRepository,
 	}
 }
 
 func (t todosService) CreateTodo(title string, userId int) (Todo, error) {
-	err := t.todoRepository.AddTodo(title, userId)
+	err := t.todosRepository.AddTodo(title, userId)
 	if err != nil {
 		return Todo{}, err
 	}
@@ -28,7 +28,7 @@ func (t todosService) CreateTodo(title string, userId int) (Todo, error) {
 }
 
 func (t todosService) GetTodos(userId int) ([]Todo, error) {
-	todos, err := t.todoRepository.GetTodos(userId)
+	todos, err := t.todosRepository.GetTodos(userId)
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +37,7 @@ func (t todosService) GetTodos(userId int) ([]Todo, error) {
 }
 
 func (t todosService) CompleteTodo(id int, userId int) error {
-	err := t.todoRepository.CompleteTodo(id, userId)
+	err := t.todosRepository.CompleteTodo(id, userId)
 	if err != nil {
 		return err
 	}

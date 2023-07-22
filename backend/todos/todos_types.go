@@ -3,6 +3,8 @@ package todos
 import (
 	"errors"
 	"net/http"
+
+	"github.com/go-chi/render"
 )
 
 type Todo struct {
@@ -29,4 +31,21 @@ type AddTodoResponse struct {
 
 func (a AddTodoResponse) Render(w http.ResponseWriter, r *http.Request) error {
 	return nil
+}
+
+type GetTodoResponse struct {
+	Todo Todo `json:"todo"`
+}
+
+func (g GetTodoResponse) Render(w http.ResponseWriter, r *http.Request) error {
+	return nil
+}
+
+func GetTodosResponse(todos []Todo) []render.Renderer {
+	todosResponse := []render.Renderer{}
+	for _, todo := range todos {
+		todosResponse = append(todosResponse, &GetTodoResponse{todo})
+	}
+
+	return todosResponse
 }
