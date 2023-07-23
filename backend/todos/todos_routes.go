@@ -7,15 +7,14 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/jwtauth/v5"
 	"github.com/go-chi/render"
-	"github.com/mateo-14/todo-api/jwt"
 	"github.com/mateo-14/todo-api/responses"
 )
 
-func Routes(db *sql.DB, todosService TodosService) http.Handler {
+func Routes(db *sql.DB, todosService TodosService, authToken *jwtauth.JWTAuth) http.Handler {
 	r := chi.NewRouter()
 
 	r.Group(func(r chi.Router) {
-		r.Use(jwtauth.Verifier(jwt.AuthToken))
+		r.Use(jwtauth.Verifier(authToken))
 		r.Use(jwtauth.Authenticator)
 
 		// Get todos endpoint

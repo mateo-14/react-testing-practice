@@ -3,9 +3,13 @@ package main
 import (
 	"database/sql"
 	"net/http"
+	"os"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
+	"github.com/go-chi/jwtauth/v5"
+	"github.com/joho/godotenv"
 	"github.com/mateo-14/todo-api/auth"
 	"github.com/mateo-14/todo-api/todos"
 )
@@ -16,10 +20,10 @@ type Todo struct {
 	Completed bool   `json:"completed"`
 }
 
-const connectionString = "postgres://postgres:admin@localhost:5432/todos?sslmode=disable"
-
 func main() {
-	db, err := sql.Open("postgres", connectionString)
+	godotenv.Load()
+
+	db, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
 	if err != nil {
 		panic(err)
 	}
@@ -33,14 +37,25 @@ func main() {
 
 func setupRoutes(r *chi.Mux, db *sql.DB) {
 	// Create dependencies
+	authToken := jwtauth.New("HS256", []byte(os.Getenv("TOKEN_SECRET")), nil)
+
 	authRepository := auth.NewAuthRepository(db)
-	authService := auth.NewAuthService(authRepository)
+	authService := auth.NewAuthService(authRepository, authToken)
 	todosRepository := todos.NewTodosRepository(db)
 	todosService := todos.NewTodosService(todosRepository)
 
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:5173"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: true,
+		MaxAge:           300,
+	}))
+
 	r.Route("/api", func(r chi.Router) {
 		r.Mount("/auth", auth.Routes(db, authService))
-		r.Mount("/todos", todos.Routes(db, todosService))
+		r.Mount("/todos", todos.Routes(db, todosService, authToken))
 	})
 
 }

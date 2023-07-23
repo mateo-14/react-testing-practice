@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/mateo-14/todo-api/jwt"
+	"github.com/go-chi/jwtauth/v5"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -15,11 +15,13 @@ type AuthService interface {
 
 type authService struct {
 	repository AuthRepository
+	authToken  *jwtauth.JWTAuth
 }
 
-func NewAuthService(repository AuthRepository) AuthService {
+func NewAuthService(repository AuthRepository, authToken *jwtauth.JWTAuth) AuthService {
 	return &authService{
 		repository: repository,
+		authToken:  authToken,
 	}
 }
 
@@ -43,7 +45,7 @@ func (a authService) LoginUser(username string, password string) (PublicUser, er
 		return publicUser, ErrInvalidUsernameOrPassword
 	}
 
-	_, token, _ := jwt.AuthToken.Encode(map[string]interface{}{"user_id": user.Id})
+	_, token, _ := a.authToken.Encode(map[string]interface{}{"user_id": user.Id})
 
 	publicUser.User = user
 	publicUser.Password = ""
