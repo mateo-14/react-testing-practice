@@ -20,7 +20,6 @@ const LoginForm = () => {
       const { data: user, status } = await login(data.username, data.password)
       if (status === 200) {
         userStore.setUser(user)
-        localStorage.setItem('token', user.token) 
       } else if (status === 401) {
         setError('root', { message: 'Username or password is incorrect' })
       } else {
