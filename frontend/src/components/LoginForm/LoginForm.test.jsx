@@ -1,13 +1,15 @@
 import { fireEvent, render, waitFor } from '@testing-library/react'
-import {  afterEach, describe, expect, it, vi } from "vitest"
-import LoginForm from "./LoginForm"
-import { login } from "../../services/authService.js"
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import LoginForm from './LoginForm'
+import { login } from '../../services/authService.js'
+import { user } from '../../mocks/data'
 
 vi.mock('../../services/authService.js', () => {
   const login = vi.fn()
   login.mockResolvedValue({
     data: {
-    }
+    },
+    status: 200
   })
 
   return {
@@ -15,11 +17,11 @@ vi.mock('../../services/authService.js', () => {
   }
 })
 
-describe('LoginForm', () => {
-  afterEach(() => {
-    vi.clearAllMocks()
-  })
+afterEach(() => {
+  vi.clearAllMocks()
+})
 
+describe('LoginForm', () => {
   it('Renders correctly', () => {
     const screen = render(<LoginForm />)
     const usernameInput = screen.getByPlaceholderText(/Username/i)
@@ -66,12 +68,12 @@ describe('LoginForm', () => {
     const usernameInput = screen.getByPlaceholderText(/Username/i)
     const passwordInput = screen.getByPlaceholderText(/Password/i)
 
-    fireEvent.change(usernameInput, { target: { value: 'username' } })
-    fireEvent.change(passwordInput, { target: { value: 'password' } })
+    fireEvent.change(usernameInput, { target: { value: user.username } })
+    fireEvent.change(passwordInput, { target: { value: user.password } })
     fireEvent.click(submitButton)
     
     await waitFor(() => {
-      expect(login).toBeCalledTimes(1)
+      expect(login).toBeCalledWith(user.username, user.password)
       expect(submitButton).toBeDisabled()
     })
   })

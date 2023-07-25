@@ -1,5 +1,3 @@
-/* eslint-disable react/prop-types */
-
 import { useRef, useState } from "react"
 
 const TodoList = () => {
@@ -38,7 +36,7 @@ const TodoList = () => {
         <input type="text" placeholder="Add a new todo" className="px-2 py-1 rounded bg-neutral-800" defaultValue="" ref={inputRef}/>
         <button className="bg-purple-600 px-6 py-1 rounded ml-4" onClick={handleAddTodo}>Add</button>
       </div>
-      <ul className="mt-5">
+      <ul className="mt-5" aria-label="Todo list">
         {todos.map(todo => (
           <TodoItem key={todo.id} onComplete={handleTodoComplete} todo={todo} />
         ))}

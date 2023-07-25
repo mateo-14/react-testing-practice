@@ -2,6 +2,7 @@ import LoginForm from "./components/LoginForm/LoginForm"
 import useUserStore from "./stores/userStore"
 import TodoList from './components/TodoList/TodoList'
 import { useState } from "react"
+import RegisterForm from "./components/RegisterForm/RegisterForm"
 
 function App() {
   const { isLoggedIn } = useUserStore()
@@ -20,10 +21,14 @@ function App() {
 function LoggedOutScreen() {
   const [showLoginForm, setShowLoginForm] = useState(true)
 
+  const handleRegister = () => {
+    setShowLoginForm(true)
+  }
+
   return (
     <div className="max-w-xs w-full mx-4">
       {
-        showLoginForm ? <LoginForm /> : 'Register form'
+        showLoginForm ? <LoginForm /> : <RegisterForm onRegister={handleRegister}/>
       }
       <button className="border-2 border-purple-600 py-1 rounded w-full mt-5 hover:bg-purple-600 transition" onClick={() => setShowLoginForm(!showLoginForm)}>{
         showLoginForm ? 'Register' : 'Login'

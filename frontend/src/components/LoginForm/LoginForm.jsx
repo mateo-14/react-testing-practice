@@ -6,7 +6,7 @@ import useUserStore from "../../stores/userStore"
 
 const schema = yup.object().shape({
   username: yup.string().required('Username is required'),
-  password: yup.string().required('Password is required')
+  password: yup.string().required('Password is required'),
 })
 
 const LoginForm = () => {
@@ -26,13 +26,12 @@ const LoginForm = () => {
         setError('root', { message: 'Something went wrong' })
       }
     } catch(err) {
-      console.log(err)
       setError('root', { message: 'Something went wrong' })
     }
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col" aria-label="Login">
       <p className="text-red-600">
         {errors.username?.message}
       </p>
