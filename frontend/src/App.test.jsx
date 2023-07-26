@@ -59,9 +59,9 @@ describe('Auth', () => {
       const registerForm = await screen.findByRole('form', { name: /Register/i })
       expect(registerForm).toBeInTheDocument()
 
-      const usernameInput = screen.getByPlaceholderText(/Username/i)
-      const passwordInput = screen.getByPlaceholderText(/Password/i)
-      const submitButton = screen.getByRole('button', { name: /Register/i })
+      const usernameInput = await screen.findByPlaceholderText(/Username/i)
+      const passwordInput = await screen.findByPlaceholderText(/Password/i)
+      const submitButton = await screen.findByRole('button', { name: /Register/i })
 
       fireEvent.change(usernameInput, { target: { value: user.username } })
       fireEvent.change(passwordInput, { target: { value: user.password } })
