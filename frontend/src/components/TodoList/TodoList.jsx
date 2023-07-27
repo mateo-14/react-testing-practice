@@ -1,32 +1,29 @@
-import { useRef, useState } from "react"
+import { useRef } from "react"
+import { useBoundStore } from "../../store/store"
 
 const TodoList = () => {
-  const [todos, setTodos] = useState([])
+  const todos = useBoundStore(state => state.todos)
+  const addTodo = useBoundStore(state => state.addTodo)
+  const completeTodo = useBoundStore(state => state.completeTodo)
+
   const inputRef = useRef(null)
 
   const handleAddTodo = () => {
-    setTodos([{
-        id: Date.now(),
-        text: inputRef.current.value,
-        completed: false
-      },
-      ...todos
-    ])
+    if (!inputRef.current.value) {
+      return
+    }
+
+    addTodo({
+      id: Date.now(),
+      text: inputRef.current.value,
+      completed: false
+    })
 
     inputRef.current.value = ''
   }
 
   const handleTodoComplete = (id) => {
-    setTodos(todos.map(todo => {
-      if (todo.id === id) {
-        return {
-          ...todo,
-          completed: !todo.completed
-        }
-      }
-
-      return todo
-    }))
+    completeTodo(id)
   }
 
   return (

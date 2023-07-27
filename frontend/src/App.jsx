@@ -1,12 +1,12 @@
 import LoginForm from "./components/LoginForm/LoginForm"
-import useUserStore from "./stores/userStore"
+import { useBoundStore } from "./store/store"
 import TodoList from './components/TodoList/TodoList'
 import { useRef, useState } from "react"
 import RegisterForm from "./components/RegisterForm/RegisterForm"
 import { CSSTransition } from 'react-transition-group'
 
 function App() {
-  const { isLoggedIn } = useUserStore()
+  const isLoggedIn = useBoundStore(state => state.isLoggedIn)
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-neutral-950 text-white flex-col relative overflow-x-hidden">
@@ -53,10 +53,10 @@ function LoggedOutScreen() {
 }
 
 function LoggedInScreen() {
-  const userStore = useUserStore()
+  const logout = useBoundStore(state => state.logout)
 
   const handleLogout = () => {
-    userStore.logout()
+    logout()
     localStorage.removeItem('token')
   }
 

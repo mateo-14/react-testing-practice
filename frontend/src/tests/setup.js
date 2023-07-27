@@ -3,9 +3,9 @@ import { cleanup } from '@testing-library/react'
 import matchers from '@testing-library/jest-dom/matchers' 
 import { server } from '../mocks/server'
 import { act } from 'react-dom/test-utils'
-import userStore from '../stores/userStore'
+import { useBoundStore } from '../store/store'
 
-const initialState = userStore.getState()
+const initialState = useBoundStore.getState()
 
 expect.extend(matchers)
 
@@ -22,6 +22,6 @@ afterEach(() => {
   cleanup()
 
   act(() => {
-    userStore.setState(initialState)
+    useBoundStore.setState(initialState)
   })
 })
