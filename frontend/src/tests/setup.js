@@ -1,12 +1,11 @@
 import { expect, afterEach, beforeAll, afterAll } from 'vitest'
 import { cleanup } from '@testing-library/react'
 import matchers from '@testing-library/jest-dom/matchers' 
-import { server } from '../mocks/server'
+import { server } from '@/mocks/server'
 import { act } from 'react-dom/test-utils'
-import { useBoundStore } from '../store/store'
+import { useBoundStore } from '@/store/store'
 
 const initialState = useBoundStore.getState()
-
 expect.extend(matchers)
 
 beforeAll(() => {
@@ -22,6 +21,6 @@ afterEach(() => {
   cleanup()
 
   act(() => {
-    useBoundStore.setState(initialState)
+    useBoundStore.setState(initialState, true)
   })
 })

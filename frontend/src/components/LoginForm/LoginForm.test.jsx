@@ -1,10 +1,10 @@
 import { fireEvent, render, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import LoginForm from './LoginForm'
-import { login } from '../../services/authService.js'
-import { user } from '../../mocks/data'
+import { login } from '@/services/authService.js'
+import { user } from '@/mocks/data'
 
-vi.mock('../../services/authService.js', () => {
+vi.mock('@/services/authService.js', () => {
   const login = vi.fn()
   login.mockResolvedValue({
     data: {

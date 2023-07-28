@@ -1,3 +1,5 @@
+import { fetchTodos } from '@/services/todosService'
+
 export const createTodosSlice = (set) => ({
   todos: [],
   setTodos: (todos) => set({ todos }),
@@ -11,5 +13,11 @@ export const createTodosSlice = (set) => ({
       }
       return todo
     })
-  }))
+  })),
+  fetchTodos: async () => {
+    const todos = await fetchTodos()
+    if (todos.status === 200) {
+      set({ todos: todos.data })
+    }
+  }
 })

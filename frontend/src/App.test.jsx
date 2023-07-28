@@ -1,7 +1,11 @@
-import { fireEvent, render } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { fireEvent, render, waitFor } from '@testing-library/react'
+import {  beforeEach, describe, expect, it } from 'vitest'
 import App from './App'
 import { user } from './mocks/data'
+import { todos as mockedTodos } from "./mocks/data"
+import { useBoundStore } from "./store/store"
+import { newTodo } from "./mocks/data"
+
 
 describe('Auth', () => { 
   it('Should render LoggedOutScreen when user is not logged in', () => {
@@ -71,5 +75,51 @@ describe('Auth', () => {
       expect(loginForm).toBeInTheDocument()      
     })
   })
+})
 
+describe('TodoList', () => {
+  beforeEach(() => {
+    useBoundStore.setState({
+      ...useBoundStore.getState(),
+      user: {
+        username: user.username
+      },
+      isLoggedIn: true,
+    }, true)
+    localStorage.setItem('token', 'token')
+  })
+
+  it('Should render todo list with mocked todos', async () => {
+    const screen = render(<App />)
+  
+    const todoList = await screen.findByRole('list', { name: /Todo list/i })
+    expect(todoList).toBeInTheDocument()
+    
+    await waitFor(() => {
+      const todos = screen.getAllByRole('listitem')
+      expect(todos).toHaveLength(mockedTodos.length)
+    })
+  })
+
+  it('Should add new todo', async () => {
+    const screen = render(<App />)
+    
+    await waitFor(() => {
+      const todos = screen.getAllByRole('listitem')
+      expect(todos).toHaveLength(mockedTodos.length)
+    })
+    
+    const input = screen.getByPlaceholderText(/Add a new todo/i)
+    fireEvent.change(input, { target: { value: newTodo.title } })
+    fireEvent.click(screen.getByRole('button', { name: /Add/i }))
+    
+    await waitFor(() => {
+      expect(input).toHaveValue('')  
+      const todos = screen.getAllByRole('listitem')
+      expect(todos).toHaveLength(mockedTodos.length + 1)
+
+      const createdTodo = screen.getAllByRole('listitem').find(todoEl => todoEl.textContent === newTodo.title)
+      expect(createdTodo).toBeInTheDocument()
+    })
+  })
 })
