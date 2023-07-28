@@ -7,13 +7,14 @@ import { CSSTransition } from 'react-transition-group'
 
 function App() {
   const isLoggedIn = useBoundStore(state => state.isLoggedIn)
+  const checkingAuth = useBoundStore(state => state.checkingAuth)
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-neutral-950 text-white flex-col relative overflow-x-hidden">
       {
-        !isLoggedIn ?
-          <LoggedOutScreen /> :
-          <LoggedInScreen />
+        isLoggedIn ? <LoggedInScreen/> :
+        checkingAuth ? <p className="text-2xl">Loading...</p> :
+        <LoggedOutScreen />
       }
     </div>
   )

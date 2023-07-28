@@ -23,13 +23,8 @@ fetchTodos.mockResolvedValue({
   }
 })
 
+
 const initialState = useBoundStore.getState()
-
-useBoundStore.setState({
-  ...initialState,
-  fetchTodos
-}, true)
-
 
 beforeEach(() => {
   vi.clearAllMocks()

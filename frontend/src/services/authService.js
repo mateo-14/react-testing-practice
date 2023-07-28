@@ -38,3 +38,18 @@ export async function register(username, password) {
     status: res.status
   }
 }
+
+export async function check(token) {
+  const res = await fetch(`${API_URL}/check`, {
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  })
+
+  const data = await res.json()
+
+  return {
+    status: res.status,
+    data: data
+  }
+}

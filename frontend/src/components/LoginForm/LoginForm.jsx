@@ -13,13 +13,13 @@ const LoginForm = () => {
   const { register, handleSubmit, formState: { errors, isSubmitting, isValid }, setError } = useForm({
     resolver: yupResolver(schema)
   })
-  const setUser = useBoundStore(state => state.setUser)
+  const loginAction = useBoundStore(state => state.login)
 
   const onSubmit = async (data) => {
     try {
       const { data: user, status } = await login(data.username, data.password)
       if (status === 200) {
-        setUser(user)
+        loginAction(user)
       } else if (status === 401) {
         setError('root', { message: 'Username or password is incorrect' })
       } else {

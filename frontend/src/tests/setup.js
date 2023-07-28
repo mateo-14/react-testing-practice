@@ -5,8 +5,13 @@ import { server } from '@/mocks/server'
 import { act } from 'react-dom/test-utils'
 import { useBoundStore } from '@/store/store'
 
-const initialState = useBoundStore.getState()
 expect.extend(matchers)
+
+useBoundStore.setState({
+  checkingAuth: false
+})
+const initialState = useBoundStore.getState()
+
 
 beforeAll(() => {
   server.listen({ onUnhandledRequest: 'error' })
