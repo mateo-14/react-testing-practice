@@ -11,7 +11,7 @@ type User struct {
 	Password string `json:"password,omitempty"`
 }
 
-type PublicUser struct {
+type AuthUser struct {
 	User
 	Token string `json:"token,omitempty"`
 }
@@ -39,7 +39,7 @@ func (l LoginRequest) Bind(r *http.Request) error {
 
 // Responses
 type AuthResponse struct {
-	PublicUser
+	AuthUser
 }
 
 func (l AuthResponse) Render(w http.ResponseWriter, r *http.Request) error {

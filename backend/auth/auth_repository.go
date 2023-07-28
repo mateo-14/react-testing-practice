@@ -10,6 +10,7 @@ import (
 type AuthRepository interface {
 	CreateUser(username string, password string) (User, error)
 	GetUserByUsername(username string) (User, error)
+	GetUserById(id int) (User, error)
 }
 
 type authRepository struct {
@@ -49,6 +50,20 @@ func (a authRepository) CreateUser(username string, password string) (User, erro
 func (a authRepository) GetUserByUsername(username string) (User, error) {
 	var user User
 	err := a.db.QueryRow("SELECT * FROM users WHERE username = $1", username).Scan(&user.Id, &user.Username, &user.Password)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return user, errors.New("user not found")
+		}
+
+		return user, errors.New("failed to get user")
+	}
+
+	return user, nil
+}
+
+func (a authRepository) GetUserById(id int) (User, error) {
+	var user User
+	err := a.db.QueryRow("SELECT id, username  FROM users WHERE id = $1", id).Scan(&user.Id, &user.Username)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return user, errors.New("user not found")

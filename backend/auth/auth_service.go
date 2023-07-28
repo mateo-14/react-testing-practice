@@ -3,14 +3,16 @@ package auth
 import (
 	"database/sql"
 	"errors"
+	"time"
 
 	"github.com/go-chi/jwtauth/v5"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthService interface {
-	LoginUser(username string, password string) (PublicUser, error)
+	LoginUser(username string, password string) (AuthUser, error)
 	RegisterUser(username string, password string) error
+	Auth(userId int) (AuthUser, error)
 }
 
 type authService struct {
@@ -29,29 +31,29 @@ var (
 	ErrInvalidUsernameOrPassword = errors.New("invalid username or password")
 )
 
-func (a authService) LoginUser(username string, password string) (PublicUser, error) {
+func (a authService) LoginUser(username string, password string) (AuthUser, error) {
 	user, err := a.repository.GetUserByUsername(username)
-	var publicUser PublicUser
+	var authUser AuthUser
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return publicUser, ErrInvalidUsernameOrPassword
+			return authUser, ErrInvalidUsernameOrPassword
 		}
-		return publicUser, err
+		return authUser, err
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
-		return publicUser, ErrInvalidUsernameOrPassword
+		return authUser, ErrInvalidUsernameOrPassword
 	}
 
-	_, token, _ := a.authToken.Encode(map[string]interface{}{"user_id": user.Id})
+	_, token, _ := a.authToken.Encode(generateAuthClaims(user.Id))
 
-	publicUser.User = user
-	publicUser.Password = ""
-	publicUser.Token = token
+	authUser.User = user
+	authUser.Password = ""
+	authUser.Token = token
 
-	return publicUser, nil
+	return authUser, nil
 }
 
 func (a authService) RegisterUser(username string, password string) error {
@@ -62,4 +64,27 @@ func (a authService) RegisterUser(username string, password string) error {
 
 	_, err = a.repository.CreateUser(username, string(hash))
 	return err
+}
+
+func (a authService) Auth(userId int) (AuthUser, error) {
+	var authUser AuthUser
+	user, err := a.repository.GetUserById(userId)
+	if err != nil {
+		return authUser, err
+	}
+
+	_, token, _ := a.authToken.Encode(generateAuthClaims(user.Id))
+
+	authUser.User = user
+	authUser.Password = ""
+	authUser.Token = token
+
+	return authUser, nil
+}
+
+func generateAuthClaims(userId int) map[string]interface{} {
+	return map[string]interface{}{
+		"user_id": userId,
+		"exp":     jwtauth.ExpireIn(time.Hour * 24 * 7),
+	}
 }

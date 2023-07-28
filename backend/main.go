@@ -54,7 +54,7 @@ func setupRoutes(r *chi.Mux, db *sql.DB) {
 	}))
 
 	r.Route("/api", func(r chi.Router) {
-		r.Mount("/auth", auth.Routes(db, authService))
+		r.Mount("/auth", auth.Routes(db, authService, authToken))
 		r.Mount("/todos", todos.Routes(db, todosService, authToken))
 	})
 
