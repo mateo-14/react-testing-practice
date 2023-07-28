@@ -34,7 +34,7 @@ func (a AddTodoResponse) Render(w http.ResponseWriter, r *http.Request) error {
 }
 
 type GetTodoResponse struct {
-	Todo Todo `json:"todo"`
+	Todo
 }
 
 func (g GetTodoResponse) Render(w http.ResponseWriter, r *http.Request) error {
