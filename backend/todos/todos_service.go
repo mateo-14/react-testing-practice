@@ -4,6 +4,7 @@ type TodosService interface {
 	CreateTodo(title string, userId int) (Todo, error)
 	GetTodos(userId int) ([]Todo, error)
 	CompleteTodo(id int, userId int) error
+	UncompleteTodo(id int, userId int) error
 }
 
 type todosService struct {
@@ -28,19 +29,13 @@ func (t todosService) CreateTodo(title string, userId int) (Todo, error) {
 }
 
 func (t todosService) GetTodos(userId int) ([]Todo, error) {
-	todos, err := t.todosRepository.GetTodos(userId)
-	if err != nil {
-		return nil, err
-	}
-
-	return todos, nil
+	return t.todosRepository.GetTodos(userId)
 }
 
 func (t todosService) CompleteTodo(id int, userId int) error {
-	err := t.todosRepository.CompleteTodo(id, userId)
-	if err != nil {
-		return err
-	}
+	return t.todosRepository.CompleteTodo(id, userId)
+}
 
-	return nil
+func (t todosService) UncompleteTodo(id int, userId int) error {
+	return t.todosRepository.UncompleteTodo(id, userId)
 }

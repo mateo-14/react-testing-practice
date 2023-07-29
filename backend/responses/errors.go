@@ -25,14 +25,6 @@ func ErrInvalidRequest(err error) render.Renderer {
 	}
 }
 
-func ErrRender(err error) render.Renderer {
-	return &ErrResponse{
-		Err:            err,
-		HTTPStatusCode: 422,
-		ErrorText:      err.Error(),
-	}
-}
-
 func ErrUnauthorized(err error) render.Renderer {
 	return &ErrResponse{
 		Err:            err,

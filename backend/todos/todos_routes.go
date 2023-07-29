@@ -3,6 +3,7 @@ package todos
 import (
 	"database/sql"
 	"net/http"
+	"strconv"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/jwtauth/v5"
@@ -51,6 +52,59 @@ func Routes(db *sql.DB, todosService TodosService, authToken *jwtauth.JWTAuth) h
 			render.Render(w, r, &AddTodoResponse{todo})
 		})
 
+		// Complete todo endpoint
+		r.Put("/{id}/complete", func(w http.ResponseWriter, r *http.Request) {
+			_, claims, _ := jwtauth.FromContext(r.Context())
+			userId := int(claims["user_id"].(float64))
+
+			todoIdParam := chi.URLParam(r, "id")
+			todoId, _ := strconv.Atoi(todoIdParam)
+
+			err := todosService.CompleteTodo(todoId, userId)
+			if err != nil {
+				// TODO check if todo not found
+				render.Render(w, r, responses.ErrInternalServer(err))
+				return
+			}
+
+			w.WriteHeader(http.StatusOK)
+		})
+
+		r.Delete("/{id}/complete", func(w http.ResponseWriter, r *http.Request) {
+			_, claims, _ := jwtauth.FromContext(r.Context())
+			userId := int(claims["user_id"].(float64))
+
+			todoIdParam := chi.URLParam(r, "id")
+			todoId, _ := strconv.Atoi(todoIdParam)
+
+			err := todosService.UncompleteTodo(todoId, userId)
+			if err != nil {
+				// TODO check if todo not found
+				render.Render(w, r, responses.ErrInternalServer(err))
+				return
+			}
+
+			w.WriteHeader(http.StatusOK)
+		})
+
+		// Delete todo endpoint
+		r.Delete("/{id}", func(w http.ResponseWriter, r *http.Request) {
+			/* 	_, claims, _ := jwtauth.FromContext(r.Context())
+			userId := int(claims["user_id"].(float64))
+
+			todoIdParam := chi.URLParam(r, "id")
+			todoId, _ := strconv.Atoi(todoIdParam)
+
+			err := todosService.DeleteTodoById(todoId, userId)
+			if err != nil {
+				render.Render(w, r, responses.ErrInternalServer(err))
+				return
+			}
+
+			w.WriteHeader(http.StatusOK) */
+
+			w.WriteHeader(http.StatusNotImplemented)
+		})
 	})
 
 	return r

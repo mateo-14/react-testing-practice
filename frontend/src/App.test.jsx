@@ -1,10 +1,34 @@
 import { fireEvent, render, waitFor } from '@testing-library/react'
-import {  beforeEach, describe, expect, it } from 'vitest'
+import {  afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import App from './App'
 import { user } from './mocks/data'
 import { todos as mockedTodos } from "./mocks/data"
 import { useBoundStore } from "./store/store"
 import { newTodo } from "./mocks/data"
+import { server } from '@/mocks/server'
+import { act } from "react-dom/test-utils"
+
+useBoundStore.setState({
+  checkingAuth: false
+})
+
+const initialState = useBoundStore.getState()
+
+beforeAll(() => {
+  server.listen({ onUnhandledRequest: 'error' })
+})
+
+afterAll(() => {
+  server.close()
+})
+
+afterEach(() => {
+  server.resetHandlers()
+
+  act(() => {
+    useBoundStore.setState(initialState, true)
+  })
+})
 
 
 describe('Auth', () => { 

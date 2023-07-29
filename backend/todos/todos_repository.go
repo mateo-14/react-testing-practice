@@ -9,6 +9,7 @@ type TodosRepository interface {
 	AddTodo(title string, userId int) error
 	GetTodos(userId int) ([]Todo, error)
 	CompleteTodo(id int, userId int) error
+	UncompleteTodo(id int, userId int) error
 }
 
 type todosRepository struct {
@@ -63,6 +64,19 @@ func (t todosRepository) CompleteTodo(id int, userId int) error {
 		}
 
 		return errors.New("failed to complete todo")
+	}
+
+	return nil
+}
+
+func (t todosRepository) UncompleteTodo(id int, userId int) error {
+	_, err := t.db.Exec("UPDATE todos SET is_completed = false WHERE id = $1 AND user_id = $2", id, userId)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return errors.New("todo not found")
+		}
+
+		return errors.New("failed to uncomplete todo")
 	}
 
 	return nil

@@ -44,7 +44,7 @@ func Routes(db *sql.DB, authService AuthService, authToken *jwtauth.JWTAuth) htt
 
 		err := authService.RegisterUser(body.Username, body.Password)
 		if err != nil {
-			render.Render(w, r, responses.ErrRender(err))
+			render.Render(w, r, responses.ErrInvalidRequest(err))
 			return
 		}
 

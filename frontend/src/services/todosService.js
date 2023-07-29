@@ -20,7 +20,7 @@ export async function fetchTodos() {
   }
 }
 
-export async function createTodo (todo) {
+export async function createTodo(todo) {
   const token = localStorage.getItem('token')
   if (!token) {
     return {
@@ -42,5 +42,45 @@ export async function createTodo (todo) {
   return {
     status: res.status,
     data: data
+  }
+}
+
+export async function completeTodo(id) {
+  const token = localStorage.getItem('token')
+  if (!token) {
+    return {
+      status: 401
+    }
+  }
+
+  const res = await fetch(`${import.meta.env.VITE_API_URL}/todos/${id}/complete`, {
+    method: 'PUT',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  })
+
+  return {
+    status: res.status
+  }
+}
+
+export async function uncompleteTodo(id) {
+  const token = localStorage.getItem('token')
+  if (!token) {
+    return {
+      status: 401
+    }
+  }
+
+  const res = await fetch(`${import.meta.env.VITE_API_URL}/todos/${id}/complete`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  })
+
+  return {
+    status: res.status
   }
 }
