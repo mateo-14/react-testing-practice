@@ -84,3 +84,23 @@ export async function uncompleteTodo(id) {
     status: res.status
   }
 }
+
+export async function deleteTodo(id) {
+  const token = localStorage.getItem('token')
+  if (!token) {
+    return {
+      status: 401
+    }
+  }
+
+  const res = await fetch(`${import.meta.env.VITE_API_URL}/todos/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  })
+
+  return {
+    status: res.status
+  }
+}

@@ -20,7 +20,10 @@ vi.mock('@/services/todosService', async () => {
     }),
     uncompleteTodo: vi.fn().mockResolvedValue({
       status: 200
-    })
+    }),
+    deleteTodo: vi.fn().mockResolvedValue({
+      status: 200
+    }),
   }
 })
 

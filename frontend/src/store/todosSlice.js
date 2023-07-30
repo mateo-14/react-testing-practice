@@ -1,5 +1,4 @@
-import { fetchTodos, createTodo, completeTodo } from '@/services/todosService'
-import { uncompleteTodo } from '../services/todosService'
+import { fetchTodos, createTodo, completeTodo, uncompleteTodo, deleteTodo } from '@/services/todosService'
 
 export const createTodosSlice = (set, get) => ({
   todos: [],
@@ -39,9 +38,14 @@ export const createTodosSlice = (set, get) => ({
       console.log(`Error while creating todo: ${err}`)
     }
   },
-  deleteTodo: (id) => {
-    // TODO Call API to delete todo
+  deleteTodo: async (id) => {
     set((state) => ({ todos: state.todos.filter((todo) => todo.id !== id) }))
+
+    try {
+      await deleteTodo(id)
+    } catch (err) {
+      console.log(`Error while deleting todo: ${err}`)
+    }
   },
 
   _toggleCompleteTodo: (id) =>
