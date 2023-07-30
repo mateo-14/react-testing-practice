@@ -5,6 +5,7 @@ type TodosService interface {
 	GetTodos(userId int) ([]Todo, error)
 	CompleteTodo(id int, userId int) error
 	UncompleteTodo(id int, userId int) error
+	DeleteTodo(id int, userId int) error
 }
 
 type todosService struct {
@@ -18,7 +19,7 @@ func NewTodosService(todosRepository TodosRepository) TodosService {
 }
 
 func (t todosService) CreateTodo(title string, userId int) (Todo, error) {
-	err := t.todosRepository.AddTodo(title, userId)
+	err := t.todosRepository.Add(title, userId)
 	if err != nil {
 		return Todo{}, err
 	}
@@ -29,13 +30,17 @@ func (t todosService) CreateTodo(title string, userId int) (Todo, error) {
 }
 
 func (t todosService) GetTodos(userId int) ([]Todo, error) {
-	return t.todosRepository.GetTodos(userId)
+	return t.todosRepository.GetAll(userId)
 }
 
 func (t todosService) CompleteTodo(id int, userId int) error {
-	return t.todosRepository.CompleteTodo(id, userId)
+	return t.todosRepository.Update(id, userId, map[string]interface{}{"is_completed": true})
 }
 
 func (t todosService) UncompleteTodo(id int, userId int) error {
-	return t.todosRepository.UncompleteTodo(id, userId)
+	return t.todosRepository.Update(id, userId, map[string]interface{}{"is_completed": false})
+}
+
+func (t todosService) DeleteTodo(id int, userId int) error {
+	return t.todosRepository.Delete(id, userId)
 }

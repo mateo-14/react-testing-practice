@@ -62,7 +62,11 @@ func Routes(db *sql.DB, todosService TodosService, authToken *jwtauth.JWTAuth) h
 
 			err := todosService.CompleteTodo(todoId, userId)
 			if err != nil {
-				// TODO check if todo not found
+				if err == errNotFoundTodo {
+					render.Render(w, r, responses.ErrNotFound(err))
+					return
+				}
+
 				render.Render(w, r, responses.ErrInternalServer(err))
 				return
 			}
@@ -79,7 +83,11 @@ func Routes(db *sql.DB, todosService TodosService, authToken *jwtauth.JWTAuth) h
 
 			err := todosService.UncompleteTodo(todoId, userId)
 			if err != nil {
-				// TODO check if todo not found
+				if err == errNotFoundTodo {
+					render.Render(w, r, responses.ErrNotFound(err))
+					return
+				}
+
 				render.Render(w, r, responses.ErrInternalServer(err))
 				return
 			}
@@ -89,21 +97,24 @@ func Routes(db *sql.DB, todosService TodosService, authToken *jwtauth.JWTAuth) h
 
 		// Delete todo endpoint
 		r.Delete("/{id}", func(w http.ResponseWriter, r *http.Request) {
-			/* 	_, claims, _ := jwtauth.FromContext(r.Context())
+			_, claims, _ := jwtauth.FromContext(r.Context())
 			userId := int(claims["user_id"].(float64))
 
 			todoIdParam := chi.URLParam(r, "id")
 			todoId, _ := strconv.Atoi(todoIdParam)
 
-			err := todosService.DeleteTodoById(todoId, userId)
+			err := todosService.DeleteTodo(todoId, userId)
 			if err != nil {
+				if err == errNotFoundTodo {
+					render.Render(w, r, responses.ErrNotFound(err))
+					return
+				}
+
 				render.Render(w, r, responses.ErrInternalServer(err))
 				return
 			}
 
-			w.WriteHeader(http.StatusOK) */
-
-			w.WriteHeader(http.StatusNotImplemented)
+			w.WriteHeader(http.StatusOK)
 		})
 	})
 

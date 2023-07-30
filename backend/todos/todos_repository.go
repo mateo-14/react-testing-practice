@@ -3,18 +3,21 @@ package todos
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 )
 
 type TodosRepository interface {
-	AddTodo(title string, userId int) error
-	GetTodos(userId int) ([]Todo, error)
-	CompleteTodo(id int, userId int) error
-	UncompleteTodo(id int, userId int) error
+	Add(title string, userId int) error
+	GetAll(userId int) ([]Todo, error)
+	Update(id int, userId int, values map[string]interface{}) error
+	Delete(id int, userId int) error
 }
 
 type todosRepository struct {
 	db *sql.DB
 }
+
+var errNotFoundTodo = errors.New("todo not found")
 
 func NewTodosRepository(db *sql.DB) TodosRepository {
 	_, err := db.Exec("CREATE TABLE IF NOT EXISTS todos (id SERIAL PRIMARY KEY, title VARCHAR(50), is_completed BOOLEAN DEFAULT false, user_id INTEGER REFERENCES users(id))")
@@ -27,7 +30,7 @@ func NewTodosRepository(db *sql.DB) TodosRepository {
 	}
 }
 
-func (t todosRepository) AddTodo(title string, userId int) error {
+func (t todosRepository) Add(title string, userId int) error {
 	_, err := t.db.Exec("INSERT INTO todos (title, user_id) VALUES ($1, $2)", title, userId)
 	if err != nil {
 		return errors.New("failed to add todo")
@@ -36,7 +39,7 @@ func (t todosRepository) AddTodo(title string, userId int) error {
 	return nil
 }
 
-func (t todosRepository) GetTodos(userId int) ([]Todo, error) {
+func (t todosRepository) GetAll(userId int) ([]Todo, error) {
 	rows, err := t.db.Query("SELECT id, title, is_completed FROM todos WHERE user_id = $1", userId)
 	if err != nil {
 		return nil, errors.New("failed to get todos")
@@ -56,27 +59,41 @@ func (t todosRepository) GetTodos(userId int) ([]Todo, error) {
 	return todos, nil
 }
 
-func (t todosRepository) CompleteTodo(id int, userId int) error {
-	_, err := t.db.Exec("UPDATE todos SET is_completed = true WHERE id = $1 AND user_id = $2", id, userId)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return errors.New("todo not found")
-		}
+func (t todosRepository) Update(id int, userId int, values map[string]interface{}) error {
+	var params []interface{}
+	query := "UPDATE todos SET "
 
-		return errors.New("failed to complete todo")
+	for key, value := range values {
+		query += fmt.Sprintf("%s = $%d, ", key, len(params)+1)
+		params = append(params, value)
+	}
+	query = query[:len(query)-2]
+
+	query += fmt.Sprintf(" WHERE id = $%d AND user_id = $%d;", len(params)+1, len(params)+2)
+	params = append(params, id, userId)
+
+	res, err := t.db.Exec(query, params...)
+
+	if err != nil {
+		return errors.New("failed to update todo")
+	}
+
+	if rowsAffected, _ := res.RowsAffected(); rowsAffected == 0 {
+		return errNotFoundTodo
 	}
 
 	return nil
 }
 
-func (t todosRepository) UncompleteTodo(id int, userId int) error {
-	_, err := t.db.Exec("UPDATE todos SET is_completed = false WHERE id = $1 AND user_id = $2", id, userId)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return errors.New("todo not found")
-		}
+func (t todosRepository) Delete(id int, userId int) error {
+	res, err := t.db.Exec("DELETE FROM todos WHERE id = $1 AND user_id = $2;", id, userId)
 
-		return errors.New("failed to uncomplete todo")
+	if err != nil {
+		return errors.New("failed to delete todo")
+	}
+
+	if rowsAffected, _ := res.RowsAffected(); rowsAffected == 0 {
+		return errNotFoundTodo
 	}
 
 	return nil
